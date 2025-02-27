@@ -1,8 +1,6 @@
 import { UsersOAuthClient, UsersS2SAuthClient, ConsoleLogger, HttpReceiver } from "@zoom/rivet/users";
 import express from 'express';
 import dotenv from 'dotenv';
-import open, {openApp, apps} from 'open';
-import { createHmac } from "crypto";
 
 const exPort: number = 5010;
 const app: any = express();
