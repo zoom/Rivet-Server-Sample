@@ -1,4 +1,4 @@
-import { UsersOAuthClient, UsersS2SAuthClient, ConsoleLogger, HttpReceiver } from "@zoom/rivet/users";
+import { UsersOAuthClient, UsersS2SAuthClient, ConsoleLogger } from "@zoom/rivet/users";
 import express from 'express';
 import dotenv from 'dotenv';
 
@@ -38,6 +38,7 @@ const startServer = async () => {
     await usersOAuthClient.start();
     await usersS2SOAuthClient.start();
 
+    //events
     usersS2SOAuthClient.webEventConsumer.event("user.created", (response: any)=>{
         logger.info(['Event Received', response.payload]);
     });
@@ -48,6 +49,7 @@ const startServer = async () => {
         logger.info(['Event Received', response.payload]);
     });
     
+    //endpoints
     app.get('/', (req: any, res: any)=>{
         res.status(200).send('User Server Running!')
     });
