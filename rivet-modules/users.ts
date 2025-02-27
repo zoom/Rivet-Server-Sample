@@ -53,22 +53,7 @@ const startServer = async () => {
     app.get('/', (req: any, res: any)=>{
         res.status(200).send('User Server Running!')
     });
-    app.post('/webhook', (req: any, res: any) => {
-        if (req.body.event === 'endpoint.url_validation') {
-            console.log(req.body);
-            const hashForValidate = createHmac('sha256', <string>process.env.WEBHOOK_SECRET_TOKEN).update(req.body.payload.plainToken).digest('hex');
-         
-            res.status(200);
-            res.json({
-              "plainToken": req.body.payload.plainToken,
-              "encryptedToken": hashForValidate
-            });
-         } 
-         else {
-           console.log(req.body);
-         }
-         res.status(200).send();
-    });
+
     app.get('/getuser', async (req: any, res: any)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
