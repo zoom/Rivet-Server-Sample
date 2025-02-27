@@ -1,0 +1,40 @@
+{
+  "name": "rivet-sample-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "users": "npx tsx rivet-modules/users.ts",
+    "accounts": "npx tsx rivet-modules/accounts.ts",
+    "meetings": "npx tsx rivet-modules/meetings.ts",
+    "start": "concurrently -p \"[{name}]\" -n \"users,accounts,meetings\" -c \"cyan,green,yellow\" \"npm run users\"  \"npm run accounts\" \"npm run meetings\""
+  },
+  "dependencies": {
+    "@types/express": "^5.0.0",
+    "@zoom/rivet": "^0.2.2",
+    "base64url": "^3.0.1",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.5",
+    "express": "^4.21.2",
+    "http": "^0.0.1-security",
+    "jsrsasign": "^10.6.1",
+    "node-fetch": "^3.2.0",
+    "node-fetch-commonjs": "^3.2.4",
+    "open": "^10.1.0",
+    "path": "^0.12.7",
+    "socket.io": "^4.8.1",
+    "url": "^0.11.0",
+    "util": "^0.12.5"
+  },
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  }
+}
