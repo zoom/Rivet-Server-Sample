@@ -38,6 +38,11 @@ const startServer = async () => {
     await usersOAuthClient.start();
     await usersS2SOAuthClient.start();
 
+    /**
+     * For the following events and endpoints, you can switch out usersS2SOAuthClient for usersOAuthClient 
+     * if user OAuth is the authentication of choice.
+     */
+
     //events
     usersS2SOAuthClient.webEventConsumer.event("user.created", (response: any)=>{
         logger.info(['Event Received', response.payload]);
