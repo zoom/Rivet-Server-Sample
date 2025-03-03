@@ -2,7 +2,7 @@ import { UsersOAuthClient, UsersS2SAuthClient, ConsoleLogger } from "@zoom/rivet
 import express from 'express';
 import dotenv from 'dotenv';
 
-const exPort: number = 5010;
+const exPort: number = parseInt(<string>process.env.USERS_SERVER_PORT);
 const app: any = express();
 app.use(express.json());
 dotenv.config();
@@ -24,7 +24,7 @@ const startServer = async () => {
         clientSecret: <string>process.env.CLIENT_SECRET,
         webhooksSecretToken: <string>process.env.WEBHOOK_SECRET_TOKEN,
         installerOptions: installerOptions,
-        port: 5011
+        port: exPort + 1
     });
     
     const usersS2SOAuthClient = new UsersS2SAuthClient({
@@ -32,7 +32,7 @@ const startServer = async () => {
         clientSecret: <string>process.env.StS_CLIENT_SECRET,
         webhooksSecretToken: <string>process.env.StS_WEBHOOK_SECRET_TOKEN,
         accountId: <string>process.env.ACCOUNT_ID,
-        port: 5012
+        port: exPort + 2
     });
 
     await usersOAuthClient.start();
@@ -56,7 +56,7 @@ const startServer = async () => {
     
     //endpoints
     app.get('/', (req: any, res: any)=>{
-        res.status(200).send('User Server Running!')
+        res.status(200).send('Users API Server Running!')
     });
 
     app.get('/getuser', async (req: any, res: any)=>{
