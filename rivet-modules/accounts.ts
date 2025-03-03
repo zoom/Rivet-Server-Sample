@@ -58,7 +58,7 @@ const startServer = async () => {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
         }
-        if (!('body' in req.body)) {
+        if (!('path' in req.body)) {
             res.status(400).send({test_server_error: "Request Body must include 'path' key"});
             return;
         }

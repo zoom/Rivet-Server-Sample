@@ -64,16 +64,17 @@ const startServer = async () => {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
         }
-        if (!('body' in req.body)) {
+        if (!('path' in req.body)) {
             res.status(400).send({test_server_error: "Request Body must include 'path' key"});
             return;
         }
 
         let request_data = req.body;
         let path = request_data.path;
+        let query = ('query' in request_data) ? request_data.query : {};
 
         try {
-          let responseData: any = await meetingsS2SOAuthClient.endpoints.meetings.getMeeting({ path });
+          let responseData: any = await meetingsS2SOAuthClient.endpoints.meetings.getMeeting({ path, query });
           logger.info(['meeting retrieved', responseData]);
           res.status(200).send({success: 'meeting retrieved', response: responseData});
         } catch (err) {

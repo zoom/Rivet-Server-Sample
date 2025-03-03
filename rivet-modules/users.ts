@@ -64,16 +64,17 @@ const startServer = async () => {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
         }
-        if (!('body' in req.body)) {
+        if (!('path' in req.body)) {
             res.status(400).send({test_server_error: "Request Body must include 'path' key"});
             return;
         }
 
         let request_data = req.body;
         let path = request_data.path;
+        let query = ('query' in request_data) ? request_data.query : {};
 
         try {
-          let responseData: any = await usersS2SOAuthClient.endpoints.users.getUser({ path });
+          let responseData: any = await usersS2SOAuthClient.endpoints.users.getUser({ path, query });
           logger.info(['user retrieved', responseData]);
           res.status(200).send({success: 'user retrieved', response: responseData});
         } catch (err) {
