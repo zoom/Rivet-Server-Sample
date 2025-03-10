@@ -1,7 +1,7 @@
 import {VideoSdkClient, ConsoleLogger } from "@zoom/rivet/videosdk";
 import express from 'express';
 import dotenv from 'dotenv';
-import KJUR from 'jsrsasign';
+
 
 const exPort: number = parseInt(<string>process.env.VIDEOSDK_SERVER_PORT);
 const app: any = express();
