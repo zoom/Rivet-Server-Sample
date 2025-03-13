@@ -1,4 +1,4 @@
-import { UsersOAuthClient, UsersS2SAuthClient, ConsoleLogger } from "@zoom/rivet/users";
+import { UsersOAuthClient, UsersS2SAuthClient, ConsoleLogger, AwsLambdaReceiver } from "@zoom/rivet/users";
 import express from 'express';
 import dotenv from 'dotenv';
 
@@ -32,6 +32,9 @@ const startServer = async () => {
         clientSecret: <string>process.env.StS_CLIENT_SECRET,
         webhooksSecretToken: <string>process.env.StS_WEBHOOK_SECRET_TOKEN,
         accountId: <string>process.env.ACCOUNT_ID,
+        receiver: new AwsLambdaReceiver({
+            webhooksSecretToken: <string>process.env.StS_WEBHOOK_SECRET_TOKEN
+        }),
         port: exPort + 2
     });
 
