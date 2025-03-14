@@ -1,0 +1,52 @@
+{
+  "/Users/TicorrianHeard/Documents/Coding/rivet-sample-app/serverless.yml": {
+    "versionFramework": "4.8.0",
+    "servicePath": "/Users/TicorrianHeard/Documents/Coding/rivet-sample-app/serverless.yml",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "frameworkVersion": "4",
+      "service": "serverless-rivet-js",
+      "provider": {
+        "name": "aws",
+        "runtime": "nodejs20.x"
+      },
+      "functions": {
+        "rivet": {
+          "handler": "boot.handler",
+          "events": [
+            {
+              "http": {
+                "path": "zoom/events",
+                "method": "post"
+              }
+            }
+          ]
+        }
+      },
+      "plugins": [
+        "serverless-offline",
+        "serverless-dotenv-plugin"
+      ]
+    },
+    "provider": {
+      "name": "aws",
+      "runtime": "nodejs20.x"
+    },
+    "error": {
+      "message": "request to https://core.serverless.com/api/bff/ failed, reason: self-signed certificate in certificate chain",
+      "stack": "Error: request to https://core.serverless.com/api/bff/ failed, reason: self-signed certificate in certificate chain\n    at Authentication.getClientDataFromAccessKey (file:///Users/TicorrianHeard/.serverless/releases/4.8.0/package/dist/sf-core.js:1159:18340)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async Authentication.getAuthenticatedData (file:///Users/TicorrianHeard/.serverless/releases/4.8.0/package/dist/sf-core.js:1159:3689)\n    at async Authentication.authenticate (file:///Users/TicorrianHeard/.serverless/releases/4.8.0/package/dist/sf-core.js:1159:21826)\n    at async TraditionalRunner.resolveVariablesAndAuthenticate (file:///Users/TicorrianHeard/.serverless/releases/4.8.0/package/dist/sf-core.js:1177:2379)\n    at async TraditionalRunner.run (file:///Users/TicorrianHeard/.serverless/releases/4.8.0/package/dist/sf-core.js:1463:27948)\n    at async route (file:///Users/TicorrianHeard/.serverless/releases/4.8.0/package/dist/sf-core.js:1509:2779)\n    at async Object.run (file:///Users/TicorrianHeard/.serverless/releases/4.8.0/package/dist/sf-core.js:1510:3668)\n    at async run2 (file:///Users/TicorrianHeard/.serverless/releases/4.8.0/package/dist/sf-core.js:1510:4821)"
+    },
+    "serviceRawFile": "frameworkVersion: \"4\"\n\nservice: serverless-rivet-js\n\nprovider:\n  name: aws\n  runtime: nodejs20.x\n\nfunctions:\n  rivet:\n    handler: boot.handler\n    events:\n      - http:\n          path: zoom/events\n          method: post\n\nplugins:\n  - serverless-offline\n  - serverless-dotenv-plugin",
+    "command": [
+      "offline"
+    ],
+    "options": {
+      "noPrependStageInUrl": true
+    },
+    "serviceProviderAwsCfStackId": null,
+    "serviceProviderAwsCfStackCreated": null,
+    "serviceProviderAwsCfStackUpdated": null,
+    "serviceProviderAwsCfStackStatus": null,
+    "serviceProviderAwsCfStackOutputs": null
+  }
+}
