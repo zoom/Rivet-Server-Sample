@@ -1,4 +1,4 @@
-import { AccountsOAuthClient, AccountsS2SAuthClient, ConsoleLogger } from "@zoom/rivet/accounts";
+import { AccountsS2SAuthClient, ConsoleLogger } from "@zoom/rivet/accounts";
 import express from 'express';
 import dotenv from 'dotenv';
 

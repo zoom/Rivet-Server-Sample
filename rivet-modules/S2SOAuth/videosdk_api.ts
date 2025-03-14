@@ -2,7 +2,6 @@ import {VideoSdkClient, ConsoleLogger } from "@zoom/rivet/videosdk";
 import express from 'express';
 import dotenv from 'dotenv';
 
-
 const app: any = express();
 app.use(express.json());
 dotenv.config();

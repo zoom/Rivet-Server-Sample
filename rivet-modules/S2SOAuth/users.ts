@@ -8,7 +8,6 @@ dotenv.config();
 
 const exPort: number = parseInt(process.argv[2] || <string>process.env.USERS_SERVER_PORT);
 
-
 const startServer = async () => {
     // Rivet SDK Logger
     const logger = new ConsoleLogger();

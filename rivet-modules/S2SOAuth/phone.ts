@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 const app: any = express();
 app.use(express.json());
 dotenv.config();
+
 const exPort: number = parseInt(process.argv[2] || <string>process.env.PHONE_SERVER_PORT);
 
 const startServer = async () => {
