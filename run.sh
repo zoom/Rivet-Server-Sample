@@ -2,7 +2,7 @@
 auth=
 module=
 port=
-color="cyan"
+color="auto"
 
 function help {
  echo "./run.sh [options]
@@ -32,7 +32,6 @@ while (( $# > 0 )) ; do
 
     --) shift; break ;;
     -*) printf >&2 'Unknown option %s\n' "$1" ; exit 1 ;;
-    #  *) break ;;
   esac
   shift
 done
