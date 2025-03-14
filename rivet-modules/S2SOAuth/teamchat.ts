@@ -2,19 +2,13 @@ import { TeamChatS2SAuthClient, ConsoleLogger } from "@zoom/rivet/teamchat";
 import express from 'express';
 import dotenv from 'dotenv';
 
-const exPort: number = parseInt(<string>process.env.TEAMCHAT_SERVER_PORT);
 const app: any = express();
 app.use(express.json());
 dotenv.config();
 
+const exPort: number = parseInt(process.argv[2] || <string>process.env.TEAMCHAT_SERVER_PORT);
+
 const startServer = async () => {
-
-    let installerOptions = {
-        redirectUri: <string>process.env.REDIRECT_URI,
-        // redirectUriPath: <string>process.env.REDIRECT_URI_PATH,
-        stateStore: <string>process.env.STATE_STORE
-    };
-
     // Rivet SDK Logger
     const logger = new ConsoleLogger();
 
@@ -247,9 +241,12 @@ const startServer = async () => {
     });
 };
 
-startServer();
-
-app.listen(exPort, () => {
-    console.log(`Zoom Rivet teamChat Server Started on port ${exPort}`);
-    // open('http://localhost:5021/zoom/oauth/install');
-});
+if (typeof exPort === 'number' && exPort > 1023 && exPort < 65536) {
+    startServer();
+    
+    app.listen(exPort, () => {
+        console.log(`Zoom Rivet Team Chat Server Started on port ${exPort}`);
+    });
+  } else {
+      console.log("Please use port range 1024-65535");
+}

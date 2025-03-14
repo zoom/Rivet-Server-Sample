@@ -1,33 +1,19 @@
-import { UsersOAuthClient, UsersS2SAuthClient, ConsoleLogger } from "@zoom/rivet/users";
+import { MeetingsS2SAuthClient, ConsoleLogger } from "@zoom/rivet/meetings";
 import express from 'express';
 import dotenv from 'dotenv';
 
-const exPort: number = parseInt(<string>process.env.USERS_SERVER_PORT);
 const app: any = express();
 app.use(express.json());
 dotenv.config();
 
+const exPort: number = parseInt(process.argv[2] || <string>process.env.MEETINGS_SERVER_PORT);
+
 const startServer = async () => {
-
-    let installerOptions = {
-        redirectUri: <string>process.env.REDIRECT_URI,
-        // redirectUriPath: <string>process.env.REDIRECT_URI_PATH,
-        stateStore: <string>process.env.STATE_STORE
-    };
-
     // Rivet SDK Logger
     const logger = new ConsoleLogger();
 
-    //Users API Auth
-    const usersOAuthClient = new UsersOAuthClient({
-        clientId: <string>process.env.CLIENT_ID,
-        clientSecret: <string>process.env.CLIENT_SECRET,
-        webhooksSecretToken: <string>process.env.WEBHOOK_SECRET_TOKEN,
-        installerOptions: installerOptions,
-        port: exPort + 1
-    });
-    
-    const usersS2SOAuthClient = new UsersS2SAuthClient({
+    //meetings API Auth
+    const meetingsS2SOAuthClient = new MeetingsS2SAuthClient({
         clientId: <string>process.env.StS_CLIENT_ID,
         clientSecret: <string>process.env.StS_CLIENT_SECRET,
         webhooksSecretToken: <string>process.env.StS_WEBHOOK_SECRET_TOKEN,
@@ -35,31 +21,30 @@ const startServer = async () => {
         port: exPort + 2
     });
 
-    await usersOAuthClient.start();
-    await usersS2SOAuthClient.start();
+    await meetingsS2SOAuthClient.start();
 
     /**
-     * For the following events and endpoints, you can switch out usersS2SOAuthClient for usersOAuthClient 
+     * For the following events and endpoints, you can switch out meetingsS2SOAuthClient for meetingsOAuthClient 
      * if user OAuth is the authentication of choice.
      */
 
     //events
-    usersS2SOAuthClient.webEventConsumer.event("user.created", (response: any)=>{
+    meetingsS2SOAuthClient.webEventConsumer.event("meeting.created", (response: any)=>{
         logger.info(['Event Received', response.payload]);
     });
-    usersS2SOAuthClient.webEventConsumer.event("user.deleted", (response: any)=>{
+    meetingsS2SOAuthClient.webEventConsumer.event("meeting.deleted", (response: any)=>{
         logger.info(['Event Received', response.payload]);
     });
-    usersS2SOAuthClient.webEventConsumer.event("user.updated", (response: any)=>{
+    meetingsS2SOAuthClient.webEventConsumer.event("meeting.updated", (response: any)=>{
         logger.info(['Event Received', response.payload]);
     });
     
     //endpoints
     app.get('/', (req: any, res: any)=>{
-        res.status(200).send('Users API Server Running!')
+        res.status(200).send('Meetings API Server Running!')
     });
 
-    app.get('/getuser', async (req: any, res: any)=>{
+    app.get('/getmeeting', async (req: any, res: any)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -74,39 +59,40 @@ const startServer = async () => {
         let query = ('query' in request_data) ? request_data.query : {};
 
         try {
-          let responseData: any = await usersS2SOAuthClient.endpoints.users.getUser({ path, query });
-          logger.info(['user retrieved', responseData]);
-          res.status(200).send({success: 'user retrieved', response: responseData});
+          let responseData: any = await meetingsS2SOAuthClient.endpoints.meetings.getMeeting({ path, query });
+          logger.info(['meeting retrieved', responseData]);
+          res.status(200).send({success: 'meeting retrieved', response: responseData});
         } catch (err) {
             logger.error([err]);
             res.status(400).send({test_server_error: 'check test server console log'});
         }
     });
 
-    app.post('/createuser', async (req: any, res: any)=>{
+    app.post('/createmeeting', async (req: any, res: any)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
         }
-        if (!('body' in req.body)) {
-            res.status(400).send({test_server_error: "Request Body must include 'body' key"});
+        if (!('path' in req.body)) {
+            res.status(400).send({test_server_error: "Request Body must include 'path' key"});
             return;
         }
 
         let request_data = req.body;
-        let body = request_data.body;
+        let body = ('body' in request_data) ? request_data.body : {};
+        let path = request_data.path;
 
         try {
-          let responseData: any = await usersS2SOAuthClient.endpoints.users.createUsers({ body });
-          logger.info(['user created', responseData]);
-          res.status(200).send({success: 'user created', response: responseData});
+          let responseData: any = await meetingsS2SOAuthClient.endpoints.meetings.createMeeting({ body, path });
+          logger.info(['meeting created', responseData]);
+          res.status(200).send({success: 'meeting created', response: responseData});
         } catch (err) {
             logger.error([err]);
             res.status(400).send({test_server_error: 'check test server console log'});
         }
     });
 
-    app.delete('/deleteuser', async (req: any, res: any)=>{
+    app.delete('/deletemeeting', async (req: any, res: any)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -121,16 +107,16 @@ const startServer = async () => {
         let query = ('query' in request_data) ? request_data.query : {};
 
         try {
-          let responseData: any = await usersS2SOAuthClient.endpoints.users.deleteUser({ path, query });
-          logger.info(['user deleted', responseData]);
-          res.status(200).send({success: 'user deleted'});
+          let responseData: any = await meetingsS2SOAuthClient.endpoints.meetings.deleteMeeting({ path, query });
+          logger.info(['meeting deleted', responseData]);
+          res.status(200).send({success: 'meeting deleted'});
         } catch (err) {
             logger.error([err]);
             res.status(400).send({test_server_error: 'check test server console log'});
         }
     });
 
-    app.patch('/updateuser', async (req: any, res: any)=>{
+    app.patch('/updatemeeting', async (req: any, res: any)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -146,9 +132,9 @@ const startServer = async () => {
         let query = ('query' in request_data) ? request_data.query : {};
 
         try {
-          let responseData: any = await usersS2SOAuthClient.endpoints.users.updateUser({ body, path, query });
-          logger.info(['user updated', responseData]);
-          res.status(200).send({success: 'user updated'});
+          let responseData: any = await meetingsS2SOAuthClient.endpoints.meetings.updateMeeting({ body, path, query });
+          logger.info(['meeting updated', responseData]);
+          res.status(200).send({success: 'meeting updated'});
         } catch (err) {
             logger.error([err]);
             res.status(400).send({test_server_error: 'check test server console log'});
@@ -156,9 +142,12 @@ const startServer = async () => {
     });
 };
 
-startServer();
-
-app.listen(exPort, () => {
-    console.log(`Zoom Rivet Users Server Started on port ${exPort}`);
-    // open('http://localhost:5011/zoom/oauth/install');
-});
+if (typeof exPort === 'number' && exPort > 1023 && exPort < 65536) {
+    startServer();
+    
+    app.listen(exPort, () => {
+        console.log(`Zoom Rivet Meetings Server Started on port ${exPort}`);
+    });
+  } else {
+      console.log("Please use port range 1024-65535");
+}

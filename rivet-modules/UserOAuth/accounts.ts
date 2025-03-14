@@ -1,11 +1,12 @@
-import { AccountsOAuthClient, AccountsS2SAuthClient, ConsoleLogger } from "@zoom/rivet/accounts";
+import { AccountsOAuthClient, ConsoleLogger } from "@zoom/rivet/accounts";
 import express from 'express';
 import dotenv from 'dotenv';
 
-const exPort: number = parseInt(<string>process.env.ACCOUNTS_SERVER_PORT);
 const app: any = express();
 app.use(express.json());
 dotenv.config();
+
+const exPort: number = parseInt(process.argv[2] || <string>process.env.ACCOUNTS_SERVER_PORT);
 
 const startServer = async () => {
 
@@ -27,24 +28,10 @@ const startServer = async () => {
         port: exPort + 1
     });
     
-    const accountsS2SOAuthClient = new AccountsS2SAuthClient({
-        clientId: <string>process.env.StS_CLIENT_ID,
-        clientSecret: <string>process.env.StS_CLIENT_SECRET,
-        webhooksSecretToken: <string>process.env.StS_WEBHOOK_SECRET_TOKEN,
-        accountId: <string>process.env.ACCOUNT_ID,
-        port: exPort + 2
-    });
-
     await accountsOAuthClient.start();
-    await accountsS2SOAuthClient.start();
-
-    /**
-     * For the following events and endpoints, you can switch out accountsS2SOAuthClient for accountsOAuthClient 
-     * if user OAuth is the authentication of choice.
-     */
 
     //events
-    accountsS2SOAuthClient.webEventConsumer.event("account.settings_updated", (response: any)=>{
+    accountsOAuthClient.webEventConsumer.event("account.settings_updated", (response: any)=>{
         logger.info(['Event Received', response.payload]);
     });
     
@@ -68,7 +55,7 @@ const startServer = async () => {
         let query = ('query' in request_data) ? request_data.query : {};
  
         try {
-          let responseData: any = await accountsS2SOAuthClient.endpoints.accounts.getAccountSettings({ path, query });
+          let responseData: any = await accountsOAuthClient.endpoints.accounts.getAccountSettings({ path, query });
           logger.info(['account retrieved', responseData]);
           res.status(200).send({success: 'account retrieved', response: responseData});
         } catch (err) {
@@ -93,7 +80,7 @@ const startServer = async () => {
         let query = ('query' in request_data) ? request_data.query : {};
 
         try {
-          let responseData: any = await accountsS2SOAuthClient.endpoints.accounts.updateAccountSettings({ body, path, query });
+          let responseData: any = await accountsOAuthClient.endpoints.accounts.updateAccountSettings({ body, path, query });
           logger.info(['account updated', responseData]);
           res.status(200).send({success: 'account updated'});
         } catch (err) {
@@ -103,9 +90,12 @@ const startServer = async () => {
     });
 };
 
-startServer();
-
-app.listen(exPort, () => {
-    console.log(`Zoom Rivet accounts Server Started on port ${exPort}`);
-    // open('http://localhost:5021/zoom/oauth/install');
-});
+if (typeof exPort === 'number' && exPort > 1023 && exPort < 65536) {
+    startServer();
+    
+    app.listen(exPort, () => {
+        console.log(`Zoom Rivet Accounts Server Started on port ${exPort}`);
+    });
+  } else {
+      console.log("Please use port range 1024-65535");
+}

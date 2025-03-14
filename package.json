@@ -4,14 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "users": "npx tsx rivet-modules/users.ts",
-    "accounts": "npx tsx rivet-modules/accounts.ts",
-    "meetings": "npx tsx rivet-modules/meetings.ts",
-    "phone": "npx tsx rivet-modules/phone.ts",
-    "videosdk": "npx tsx rivet-modules/videosdk.ts",
-    "teamchat": "npx tsx rivet-modules/teamchat.ts",
-    "start": "concurrently -p \"[{name}]\" -n \"users,accounts,meetings\" -c \"cyan,green,yellow\" \"npm run users\"  \"npm run accounts\" \"npm run meetings\""
+    "start": "./run.sh --npm_config_oauth --npm_config_module --npm_config_color"
   },
   "dependencies": {
     "@types/express": "^5.0.0",

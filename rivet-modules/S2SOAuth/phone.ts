@@ -1,32 +1,17 @@
-import { PhoneOAuthClient, PhoneS2SAuthClient, ConsoleLogger } from "@zoom/rivet/phone";
+import { PhoneS2SAuthClient, ConsoleLogger } from "@zoom/rivet/phone";
 import express from 'express';
 import dotenv from 'dotenv';
 
-const exPort: number = parseInt(<string>process.env.PHONE_SERVER_PORT);
 const app: any = express();
 app.use(express.json());
 dotenv.config();
+const exPort: number = parseInt(process.argv[2] || <string>process.env.PHONE_SERVER_PORT);
 
 const startServer = async () => {
-
-    let installerOptions = {
-        redirectUri: <string>process.env.REDIRECT_URI,
-        // redirectUriPath: <string>process.env.REDIRECT_URI_PATH,
-        stateStore: <string>process.env.STATE_STORE
-    };
-
     // Rivet SDK Logger
     const logger = new ConsoleLogger();
 
     //phone API Auth
-    const phoneOAuthClient = new PhoneOAuthClient({
-        clientId: <string>process.env.CLIENT_ID,
-        clientSecret: <string>process.env.CLIENT_SECRET,
-        webhooksSecretToken: <string>process.env.WEBHOOK_SECRET_TOKEN,
-        installerOptions: installerOptions,
-        port: exPort + 1
-    });
-    
     const phoneS2SOAuthClient = new PhoneS2SAuthClient({
         clientId: <string>process.env.StS_CLIENT_ID,
         clientSecret: <string>process.env.StS_CLIENT_SECRET,
@@ -35,13 +20,7 @@ const startServer = async () => {
         port: exPort + 2
     });
 
-    await phoneOAuthClient.start();
     await phoneS2SOAuthClient.start();
-
-    /**
-     * For the following events and endpoints, you can switch out phoneS2SOAuthClient for phoneOAuthClient 
-     * if user OAuth is the authentication of choice.
-     */
 
     //events
     phoneS2SOAuthClient.webEventConsumer.event( "phone.voicemail_received", (response: any)=>{
@@ -162,9 +141,12 @@ const startServer = async () => {
     });
 };
 
-startServer();
-
-app.listen(exPort, () => {
-    console.log(`Zoom Rivet Phone Server Started on port ${exPort}`);
-    // open('http://localhost:5021/zoom/oauth/install');
-});
+if (typeof exPort === 'number' && exPort > 1023 && exPort < 65536) {
+    startServer();
+    
+    app.listen(exPort, () => {
+        console.log(`Zoom Rivet Phone Server Started on port ${exPort}`);
+    });
+  } else {
+      console.log("Please use port range 1024-65535");
+}
