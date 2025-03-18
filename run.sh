@@ -8,7 +8,7 @@ function help {
  echo "./run.sh [options]
  -o, --oauth  (required) [UserOAuth, S2SOAuth]
  
- -m, --module (required) [users, meetings, accounts, teamchat, phone, video_sdk]
+ -m, --module (required) [users, meetings, accounts, teamchat, phone, videosdk_api]
  
  -p, --port              [1024-65535]
  
@@ -22,7 +22,7 @@ while (( $# > 0 )) ; do
   case $1 in
     -o|--oauth) [[ "$2" == "UserOAuth" || "$2" == "S2SOAuth" ]] && auth="$2" || (help && exit 1) ;;
 
-    -m|--module) [[ "$2" == "users" || "$2" == "meetings" || "$2" == "accounts" || "$2" == "phone" || "$2" == "teamchat" || "$2" == "video_sdk" ]] && 
+    -m|--module) [[ "$2" == "users" || "$2" == "meetings" || "$2" == "accounts" || "$2" == "phone" || "$2" == "teamchat" || "$2" == "videosdk_api" ]] && 
                  module="$2" || 
                  (help && exit 1) ;;
     
@@ -36,7 +36,7 @@ while (( $# > 0 )) ; do
   shift
 done
 
-echo $auth $module $port $color
+# echo $auth $module $port $color
 
 concurrently -p "[{name}]" \
              -n "$auth $module" \

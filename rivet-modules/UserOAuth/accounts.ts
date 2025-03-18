@@ -2,7 +2,7 @@ import { AccountsOAuthClient, ConsoleLogger } from "@zoom/rivet/accounts";
 import express from 'express';
 import dotenv from 'dotenv';
 
-const app: any = express();
+const app: express.Application = express();
 app.use(express.json());
 dotenv.config();
 
@@ -12,7 +12,6 @@ const startServer = async () => {
 
     let installerOptions = {
         redirectUri: <string>process.env.REDIRECT_URI,
-        // redirectUriPath: <string>process.env.REDIRECT_URI_PATH,
         stateStore: <string>process.env.STATE_STORE
     };
 
@@ -30,17 +29,18 @@ const startServer = async () => {
     
     await accountsOAuthClient.start();
 
-    //events
-    accountsOAuthClient.webEventConsumer.event("account.settings_updated", (response: any)=>{
+    const eventHandler = (response: any)=>{
         logger.info(['Event Received', response.payload]);
-    });
+    }
+    //events
+    accountsOAuthClient.webEventConsumer.event("account.settings_updated", eventHandler);
     
     //endpoints
-    app.get('/', (req: any, res: any)=>{
+    app.get('/', (req: express.Request, res: express.Response)=>{
         res.status(200).send('Accounts API Server Running!')
     });
 
-    app.get('/getaccountsettings', async (req: any, res: any)=>{
+    app.get('/getaccountsettings', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -55,7 +55,7 @@ const startServer = async () => {
         let query = ('query' in request_data) ? request_data.query : {};
  
         try {
-          let responseData: any = await accountsOAuthClient.endpoints.accounts.getAccountSettings({ path, query });
+          let responseData: object = await accountsOAuthClient.endpoints.accounts.getAccountSettings({ path, query });
           logger.info(['account retrieved', responseData]);
           res.status(200).send({success: 'account retrieved', response: responseData});
         } catch (err) {
@@ -64,7 +64,7 @@ const startServer = async () => {
         }
     });
 
-    app.patch('/updateaccountsettings', async (req: any, res: any)=>{
+    app.patch('/updateaccountsettings', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -80,7 +80,7 @@ const startServer = async () => {
         let query = ('query' in request_data) ? request_data.query : {};
 
         try {
-          let responseData: any = await accountsOAuthClient.endpoints.accounts.updateAccountSettings({ body, path, query });
+          let responseData: object = await accountsOAuthClient.endpoints.accounts.updateAccountSettings({ body, path, query });
           logger.info(['account updated', responseData]);
           res.status(200).send({success: 'account updated'});
         } catch (err) {
@@ -94,7 +94,7 @@ if (typeof exPort === 'number' && exPort > 1023 && exPort < 65536) {
     startServer();
     
     app.listen(exPort, () => {
-        console.log(`Zoom Rivet Accounts Server Started on port ${exPort}`);
+        console.log(`Zoom Rivet Accounts UserOAuth Server Started on port ${exPort}`);
     });
   } else {
       console.log("Please use port range 1024-65535");

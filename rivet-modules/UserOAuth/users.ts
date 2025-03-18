@@ -2,7 +2,7 @@ import { UsersOAuthClient, ConsoleLogger } from "@zoom/rivet/users";
 import express from 'express';
 import dotenv from 'dotenv';
 
-const app: any = express();
+const app: express.Application = express();
 app.use(express.json());
 dotenv.config();
 
@@ -12,7 +12,6 @@ const startServer = async () => {
 
     let installerOptions = {
         redirectUri: <string>process.env.REDIRECT_URI,
-        // redirectUriPath: <string>process.env.REDIRECT_URI_PATH,
         stateStore: <string>process.env.STATE_STORE
     };
 
@@ -30,23 +29,20 @@ const startServer = async () => {
     
     await usersOAuthClient.start();
 
+    const eventHandler = (response: any)=>{
+        logger.info(['Event Received', response.payload]);
+    }
     //events
-    usersOAuthClient.webEventConsumer.event("user.created", (response: any)=>{
-        logger.info(['Event Received', response.payload]);
-    });
-    usersOAuthClient.webEventConsumer.event("user.deleted", (response: any)=>{
-        logger.info(['Event Received', response.payload]);
-    });
-    usersOAuthClient.webEventConsumer.event("user.updated", (response: any)=>{
-        logger.info(['Event Received', response.payload]);
-    });
+    usersOAuthClient.webEventConsumer.event("user.created", eventHandler);
+    usersOAuthClient.webEventConsumer.event("user.deleted", eventHandler);
+    usersOAuthClient.webEventConsumer.event("user.updated", eventHandler);
     
     //endpoints
-    app.get('/', (req: any, res: any)=>{
+    app.get('/', (req: express.Request, res: express.Response)=>{
         res.status(200).send('Users API Server Running!')
     });
 
-    app.get('/getuser', async (req: any, res: any)=>{
+    app.get('/getuser', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -70,7 +66,7 @@ const startServer = async () => {
         }
     });
 
-    app.post('/createuser', async (req: any, res: any)=>{
+    app.post('/createuser', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -84,7 +80,7 @@ const startServer = async () => {
         let body = request_data.body;
 
         try {
-          let responseData: any = await usersOAuthClient.endpoints.users.createUsers({ body });
+          let responseData: object = await usersOAuthClient.endpoints.users.createUsers({ body });
           logger.info(['user created', responseData]);
           res.status(200).send({success: 'user created', response: responseData});
         } catch (err) {
@@ -93,7 +89,7 @@ const startServer = async () => {
         }
     });
 
-    app.delete('/deleteuser', async (req: any, res: any)=>{
+    app.delete('/deleteuser', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -117,7 +113,7 @@ const startServer = async () => {
         }
     });
 
-    app.patch('/updateuser', async (req: any, res: any)=>{
+    app.patch('/updateuser', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -147,7 +143,7 @@ if (typeof exPort === 'number' && exPort > 1023 && exPort < 65536) {
     startServer();
     
     app.listen(exPort, () => {
-        console.log(`Zoom Rivet Users Server Started on port ${exPort}`);
+        console.log(`Zoom Rivet Users UserOAuth Server Started on port ${exPort}`);
     });
   } else {
       console.log("Please use port range 1024-65535");

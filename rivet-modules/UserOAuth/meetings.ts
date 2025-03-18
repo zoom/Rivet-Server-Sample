@@ -2,17 +2,15 @@ import { MeetingsOAuthClient, ConsoleLogger } from "@zoom/rivet/meetings";
 import express from 'express';
 import dotenv from 'dotenv';
 
-const app: any = express();
+const app: express.Application = express();
 app.use(express.json());
 dotenv.config();
 
 const exPort: number = parseInt(process.argv[2] || <string>process.env.MEETINGS_SERVER_PORT);
 
 const startServer = async () => {
-
     let installerOptions = {
         redirectUri: <string>process.env.REDIRECT_URI,
-        // redirectUriPath: <string>process.env.REDIRECT_URI_PATH,
         stateStore: <string>process.env.STATE_STORE
     };
 
@@ -27,26 +25,23 @@ const startServer = async () => {
         installerOptions: installerOptions,
         port: exPort + 1
     });
- 
+
     await meetingsOAuthClient.start();
 
+    const eventHandler = (response: any)=>{
+        logger.info(['Event Received', response.payload]);
+    }
     //events
-    meetingsOAuthClient.webEventConsumer.event("meeting.created", (response: any)=>{
-        logger.info(['Event Received', response.payload]);
-    });
-    meetingsOAuthClient.webEventConsumer.event("meeting.deleted", (response: any)=>{
-        logger.info(['Event Received', response.payload]);
-    });
-    meetingsOAuthClient.webEventConsumer.event("meeting.updated", (response: any)=>{
-        logger.info(['Event Received', response.payload]);
-    });
+    meetingsOAuthClient.webEventConsumer.event("meeting.created", eventHandler);
+    meetingsOAuthClient.webEventConsumer.event("meeting.deleted", eventHandler);
+    meetingsOAuthClient.webEventConsumer.event("meeting.updated", eventHandler);
     
     //endpoints
-    app.get('/', (req: any, res: any)=>{
+    app.get('/', (req: express.Request, res: express.Response)=>{
         res.status(200).send('Meetings API Server Running!')
     });
 
-    app.get('/getmeeting', async (req: any, res: any)=>{
+    app.get('/getmeeting', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -61,7 +56,7 @@ const startServer = async () => {
         let query = ('query' in request_data) ? request_data.query : {};
 
         try {
-          let responseData: any = await meetingsOAuthClient.endpoints.meetings.getMeeting({ path, query });
+          let responseData: object = await meetingsOAuthClient.endpoints.meetings.getMeeting({ path, query });
           logger.info(['meeting retrieved', responseData]);
           res.status(200).send({success: 'meeting retrieved', response: responseData});
         } catch (err) {
@@ -70,7 +65,7 @@ const startServer = async () => {
         }
     });
 
-    app.post('/createmeeting', async (req: any, res: any)=>{
+    app.post('/createmeeting', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -85,7 +80,7 @@ const startServer = async () => {
         let path = request_data.path;
 
         try {
-          let responseData: any = await meetingsOAuthClient.endpoints.meetings.createMeeting({ body, path });
+          let responseData: object = await meetingsOAuthClient.endpoints.meetings.createMeeting({ body, path });
           logger.info(['meeting created', responseData]);
           res.status(200).send({success: 'meeting created', response: responseData});
         } catch (err) {
@@ -94,7 +89,7 @@ const startServer = async () => {
         }
     });
 
-    app.delete('/deletemeeting', async (req: any, res: any)=>{
+    app.delete('/deletemeeting', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -109,7 +104,7 @@ const startServer = async () => {
         let query = ('query' in request_data) ? request_data.query : {};
 
         try {
-          let responseData: any = await meetingsOAuthClient.endpoints.meetings.deleteMeeting({ path, query });
+          let responseData: object = await meetingsOAuthClient.endpoints.meetings.deleteMeeting({ path, query });
           logger.info(['meeting deleted', responseData]);
           res.status(200).send({success: 'meeting deleted'});
         } catch (err) {
@@ -118,7 +113,7 @@ const startServer = async () => {
         }
     });
 
-    app.patch('/updatemeeting', async (req: any, res: any)=>{
+    app.patch('/updatemeeting', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -134,7 +129,7 @@ const startServer = async () => {
         let query = ('query' in request_data) ? request_data.query : {};
 
         try {
-          let responseData: any = await meetingsOAuthClient.endpoints.meetings.updateMeeting({ body, path, query });
+          let responseData: object = await meetingsOAuthClient.endpoints.meetings.updateMeeting({ body, path, query });
           logger.info(['meeting updated', responseData]);
           res.status(200).send({success: 'meeting updated'});
         } catch (err) {
@@ -143,8 +138,6 @@ const startServer = async () => {
         }
     });
 };
-
-startServer();
 
 if (typeof exPort === 'number' && exPort > 1023 && exPort < 65536) {
     startServer();

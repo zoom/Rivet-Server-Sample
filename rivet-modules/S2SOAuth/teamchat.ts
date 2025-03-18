@@ -2,7 +2,7 @@ import { TeamChatS2SAuthClient, ConsoleLogger } from "@zoom/rivet/teamchat";
 import express from 'express';
 import dotenv from 'dotenv';
 
-const app: any = express();
+const app: express.Application = express();
 app.use(express.json());
 dotenv.config();
 
@@ -23,33 +23,24 @@ const startServer = async () => {
 
     await teamChatS2SOAuthClient.start();
 
+    const eventHandler = (response: any)=>{
+        logger.info(['Event Received', response.payload]);
+    }
     //events
-    teamChatS2SOAuthClient.webEventConsumer.event("chat_channel.created", (response: any)=>{
-        logger.info(['Event Received', response.payload]);
-    });
-    teamChatS2SOAuthClient.webEventConsumer.event("chat_channel.deleted", (response: any)=>{
-        logger.info(['Event Received', response.payload]);
-    });
-    teamChatS2SOAuthClient.webEventConsumer.event("chat_channel.updated", (response: any)=>{
-        logger.info(['Event Received', response.payload]);
-    });
-    teamChatS2SOAuthClient.webEventConsumer.event("chat_channel.member_joined", (response: any)=>{
-        logger.info(['Event Received', response.payload]);
-    });
-    teamChatS2SOAuthClient.webEventConsumer.event("chat_channel.member_left", (response: any)=>{
-        logger.info(['Event Received', response.payload]);
-    });
-    teamChatS2SOAuthClient.webEventConsumer.event("chat_message.sent", (response: any)=>{
-        logger.info(['Event Received', response.payload]);
-    });
+    teamChatS2SOAuthClient.webEventConsumer.event("chat_channel.created", eventHandler);
+    teamChatS2SOAuthClient.webEventConsumer.event("chat_channel.deleted", eventHandler);
+    teamChatS2SOAuthClient.webEventConsumer.event("chat_channel.updated", eventHandler);
+    teamChatS2SOAuthClient.webEventConsumer.event("chat_channel.member_joined", eventHandler);
+    teamChatS2SOAuthClient.webEventConsumer.event("chat_channel.member_left", eventHandler);
+    teamChatS2SOAuthClient.webEventConsumer.event("chat_message.sent", eventHandler);
     
     //endpoints
-    app.get('/', (req: any, res: any)=>{
+    app.get('/', (req: express.Request, res: express.Response)=>{
         res.status(200).send('teamChat API Server Running!')
     });
 
     //chat channels
-    app.get('/getchannel', async (req: any, res: any)=>{
+    app.get('/getchannel', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -63,7 +54,7 @@ const startServer = async () => {
         let path = request_data.path;
 
         try {
-          let responseData: any = await teamChatS2SOAuthClient.endpoints.chatChannels.getChannel({ path });
+          let responseData: object = await teamChatS2SOAuthClient.endpoints.chatChannels.getChannel({ path });
           logger.info(['teamchat retrieved', responseData]);
           res.status(200).send({success: 'teamchat retrieved', response: responseData});
         } catch (err) {
@@ -72,7 +63,7 @@ const startServer = async () => {
         }
     });
 
-    app.post('/createchannel', async (req: any, res: any)=>{
+    app.post('/createchannel', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -87,7 +78,7 @@ const startServer = async () => {
         let path = request_data.path;
 
         try {
-          let responseData: any = await teamChatS2SOAuthClient.endpoints.chatChannels.createChannel({ body, path });
+          let responseData: object = await teamChatS2SOAuthClient.endpoints.chatChannels.createChannel({ body, path });
           logger.info(['channel created', responseData]);
           res.status(200).send({success: 'channel created', response: responseData});
         } catch (err) {
@@ -96,7 +87,7 @@ const startServer = async () => {
         }
     });
 
-    app.delete('/deletechannel', async (req: any, res: any)=>{
+    app.delete('/deletechannel', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -110,7 +101,7 @@ const startServer = async () => {
         let path = request_data.path;
 
         try {
-          let responseData: any = await teamChatS2SOAuthClient.endpoints.chatChannels.deleteChannel({ path });
+          let responseData: object = await teamChatS2SOAuthClient.endpoints.chatChannels.deleteChannel({ path });
           logger.info(['channel deleted', responseData]);
           res.status(200).send({success: 'channel deleted'});
         } catch (err) {
@@ -119,7 +110,7 @@ const startServer = async () => {
         }
     });
 
-    app.patch('/updatechannel', async (req: any, res: any)=>{
+    app.patch('/updatechannel', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -134,7 +125,7 @@ const startServer = async () => {
         let body = ('body' in request_data) ? request_data.body : {};
 
         try {
-          let responseData: any = await teamChatS2SOAuthClient.endpoints.chatChannels.updateChannel({ body, path });
+          let responseData: object = await teamChatS2SOAuthClient.endpoints.chatChannels.updateChannel({ body, path });
           logger.info(['channel updated', responseData]);
           res.status(200).send({success: 'channel updated'});
         } catch (err) {
@@ -144,7 +135,7 @@ const startServer = async () => {
     });
 
     //chat messages
-    app.get('/retrievethread', async (req: any, res: any)=>{
+    app.get('/retrievethread', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -159,7 +150,7 @@ const startServer = async () => {
         let query = request_data.query;
 
         try {
-          let responseData: any = await teamChatS2SOAuthClient.endpoints.chatMessages.retrieveThread({ path, query });
+          let responseData: object = await teamChatS2SOAuthClient.endpoints.chatMessages.retrieveThread({ path, query });
           logger.info(['thread retreived', responseData]);
           res.status(200).send({success: 'thread retreived'});
         } catch (err) {
@@ -168,7 +159,7 @@ const startServer = async () => {
         }
     });
 
-    app.post('/sendchatmessage', async (req: any, res: any)=>{
+    app.post('/sendchatmessage', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -183,7 +174,7 @@ const startServer = async () => {
         let body = request_data.body;
 
         try {
-          let responseData: any = await teamChatS2SOAuthClient.endpoints.chatMessages.sendChatMessage({ body, path });
+          let responseData: object = await teamChatS2SOAuthClient.endpoints.chatMessages.sendChatMessage({ body, path });
           logger.info(['message sent', responseData]);
           res.status(200).send({success: 'message sent'});
         } catch (err) {
@@ -192,7 +183,7 @@ const startServer = async () => {
         }
     });
 
-    app.patch('/updatechatmessage', async (req: any, res: any)=>{
+    app.patch('/updatechatmessage', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -207,7 +198,7 @@ const startServer = async () => {
         let body = ('body' in request_data) ? request_data.body : {};
 
         try {
-          let responseData: any = await teamChatS2SOAuthClient.endpoints.chatMessages.updateMessage({ body, path });
+          let responseData: object = await teamChatS2SOAuthClient.endpoints.chatMessages.updateMessage({ body, path });
           logger.info(['teamchat updated', responseData]);
           res.status(200).send({success: 'teamchat updated'});
         } catch (err) {
@@ -216,7 +207,7 @@ const startServer = async () => {
         }
     });
 
-    app.patch('/deletemessage', async (req: any, res: any)=>{
+    app.patch('/deletemessage', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -231,7 +222,7 @@ const startServer = async () => {
         let query = ('query' in request_data) ? request_data.query : {};
 
         try {
-          let responseData: any = await teamChatS2SOAuthClient.endpoints.chatMessages.deleteMessage({ path, query });
+          let responseData: object = await teamChatS2SOAuthClient.endpoints.chatMessages.deleteMessage({ path, query });
           logger.info(['message updated', responseData]);
           res.status(200).send({success: 'message updated'});
         } catch (err) {

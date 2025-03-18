@@ -2,7 +2,7 @@ import { UsersS2SAuthClient, ConsoleLogger } from "@zoom/rivet/users";
 import express from 'express';
 import dotenv from 'dotenv';
 
-const app: any = express();
+const app: express.Application = express();
 app.use(express.json());
 dotenv.config();
 
@@ -24,23 +24,20 @@ const startServer = async () => {
 
     await usersS2SOAuthClient.start();
 
+    const eventHandler = (response: any)=>{
+        logger.info(['Event Received', response.payload]);
+    }
     //events
-    usersS2SOAuthClient.webEventConsumer.event("user.created", (response: any)=>{
-        logger.info(['Event Received', response.payload]);
-    });
-    usersS2SOAuthClient.webEventConsumer.event("user.deleted", (response: any)=>{
-        logger.info(['Event Received', response.payload]);
-    });
-    usersS2SOAuthClient.webEventConsumer.event("user.updated", (response: any)=>{
-        logger.info(['Event Received', response.payload]);
-    });
+    usersS2SOAuthClient.webEventConsumer.event("user.created", eventHandler);
+    usersS2SOAuthClient.webEventConsumer.event("user.deleted", eventHandler);
+    usersS2SOAuthClient.webEventConsumer.event("user.updated", eventHandler);
     
     //endpoints
-    app.get('/', (req: any, res: any)=>{
+    app.get('/', (req: express.Request, res: express.Response)=>{
         res.status(200).send('Users API Server Running!')
     });
 
-    app.get('/getuser', async (req: any, res: any)=>{
+    app.get('/getuser', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -55,7 +52,7 @@ const startServer = async () => {
         let query = ('query' in request_data) ? request_data.query : {};
 
         try {
-          let responseData: any = await usersS2SOAuthClient.endpoints.users.getUser({ path, query });
+          let responseData: object = await usersS2SOAuthClient.endpoints.users.getUser({ path, query });
           logger.info(['user retrieved', responseData]);
           res.status(200).send({success: 'user retrieved', response: responseData});
         } catch (err) {
@@ -64,7 +61,7 @@ const startServer = async () => {
         }
     });
 
-    app.post('/createuser', async (req: any, res: any)=>{
+    app.post('/createuser', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -78,7 +75,8 @@ const startServer = async () => {
         let body = request_data.body;
 
         try {
-          let responseData: any = await usersS2SOAuthClient.endpoints.users.createUsers({ body });
+          let responseData: object = await usersS2SOAuthClient.endpoints.users.createUsers({ body });
+          console.log("HELLLLLOOOOOOO",typeof responseData);
           logger.info(['user created', responseData]);
           res.status(200).send({success: 'user created', response: responseData});
         } catch (err) {
@@ -87,7 +85,7 @@ const startServer = async () => {
         }
     });
 
-    app.delete('/deleteuser', async (req: any, res: any)=>{
+    app.delete('/deleteuser', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -102,7 +100,7 @@ const startServer = async () => {
         let query = ('query' in request_data) ? request_data.query : {};
 
         try {
-          let responseData: any = await usersS2SOAuthClient.endpoints.users.deleteUser({ path, query });
+          let responseData: object = await usersS2SOAuthClient.endpoints.users.deleteUser({ path, query });
           logger.info(['user deleted', responseData]);
           res.status(200).send({success: 'user deleted'});
         } catch (err) {
@@ -111,7 +109,7 @@ const startServer = async () => {
         }
     });
 
-    app.patch('/updateuser', async (req: any, res: any)=>{
+    app.patch('/updateuser', async (req: express.Request, res: express.Response)=>{
         if (Object.keys(req.body).length === 0) {
             res.status(400).send({test_server_error: 'Request Body cannot be empty'});
             return;
@@ -127,7 +125,7 @@ const startServer = async () => {
         let query = ('query' in request_data) ? request_data.query : {};
 
         try {
-          let responseData: any = await usersS2SOAuthClient.endpoints.users.updateUser({ body, path, query });
+          let responseData: object = await usersS2SOAuthClient.endpoints.users.updateUser({ body, path, query });
           logger.info(['user updated', responseData]);
           res.status(200).send({success: 'user updated'});
         } catch (err) {
