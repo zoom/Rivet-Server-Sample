@@ -37,3 +37,33 @@ If you are thrown a permissions error when running the bash script. You can use 
 ```
 $ chmod 700 run.sh
 ```
+
+Once the server is running, it will listen on the specified port and you can now make REST API to the corresponding module endpoints. 
+For some endpoints, you will need to provide request body, params, query according to the [Rivet SDK Reference Docs](https://zoom.github.io/rivet-javascript/modules.html). For the request body, you can reference the [Zoom API Endpoint](https://developers.zoom.us/docs/api/) that Rivet calls to. 
+
+For example, assuming you run the S2SOAuth meetings module like so: `./run.sh -o S2SOAuth -m meetings -p 8888 -c blue`
+
+here is an API call to the Rivet Sample app that makes an update to a meeting. 
+
+```
+curl --location --request PATCH 'http://localhost:8888/updatemeeting' \
+--header 'Content-Type: application/json' \
+--data '{                        <---- reference Rivet SDK docs for path, query, and body requirements
+    "path": {
+        "meetingId": "0000000000"
+    },
+    "query": {
+        "occurrence_id": "111111111"
+    },
+    "body": {                    <--- reference Zoom REST API docs for correct Request Body
+        "agenda": "My Meeting", 
+        "duration": 60,
+        "password": "newPassword",
+        "start_time": "2025-03-27T07:29:29Z",
+        "template_id": "5Cj3ceXoStO6TGOVvIOVPA==",
+        "timezone": "America/Los_Angeles",
+        "topic": "My Meeting",
+        "type": 2
+    }
+}'
+```
