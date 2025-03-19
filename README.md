@@ -1,7 +1,7 @@
 The [Zoom Rivet SDK](https://developers.zoom.us/docs/rivet/javascript/) is a framework that accelerates server-side app development for Zoom's developer products. 
 Compatible with JavaScript and TypeScript, this comprehensive tool enables developers to create integrations more quickly and spend more time on core business logic.
 
-This Sample App showcases the power of Rivet by offering a one-click, quick start backend server. This server includes each Rivet module except the chatbot module ([Sample App for Rivet Chatbot here](https://github.com/zoom/rivet-javascript-sample))
+This Sample App showcases the power of Rivet by offering a one-click, quick start Express backend server. This server includes each Rivet module except the chatbot module ([Sample App for Rivet Chatbot here](https://github.com/zoom/rivet-javascript-sample))
 
 Use of Zoom Rivet SDK is subject to our [Terms of Use](https://www.zoom.com/en/trust/terms/).
 
