@@ -8,7 +8,7 @@ function help {
  echo "./run.sh [options]
  -o, --oauth  (required) [UserOAuth, S2SOAuth]
  
- -m, --module (required) [users, meetings, accounts, teamchat, phone, videosdk_api]
+ -m, --module (required) [users, meetings, accounts, teamchat(S2SOAuth only), phone, videosdk_api(S2SOAuth only)]]
  
  -p, --port              [1024-65535]
  
