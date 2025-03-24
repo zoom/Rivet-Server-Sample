@@ -17,7 +17,23 @@ Once cloned, cd into the directory and install the npm packages:
 $ npm install
 ```
 
+## Configuration
+You will need to build a [Server-to-Server](https://developers.zoom.us/docs/internal-apps/create/) OAuth app and/or a [User Authorization OAuth app](https://developers.zoom.us/docs/integrations/create/) on the Zoom Marketplace. From there, you will receive the following credentials:
+- Server-to-Server (S2SOAuth) Client ID and Client Secret, S2S Webhook Secret Token, and your Account ID
+- User Authorization OAuth (UserOAuth) Client ID and Client and a Webhook Secret Token
+
+If you want to use Video SDK APIs, you will need an active [Zoom Video SDK account](https://developers.zoom.us/docs/video-sdk/get-credentials/) which will provide you with a Video SDK Key and Secret and a Webhook Secret Token.
+
+Insert these credentials into the respective fields in the `.env-sample` file and rename the file to `.env`.
+
+Next, specify a secure state store value for Rivet to use in the OAuth flow.
+
+Finally, specify a default port for each Rivet module to use in case no port is given in the run command. The sample app uses 2 ports, given_port and given_port+1, when it is running.
+
+You are now ready to use the Rivet Sample App!
+
 ## Usage
+
 In the project, there is a bash script `run.sh` that is used to run the modules. The commands and options are as follows
 ```bash
 ./run.sh [options]
