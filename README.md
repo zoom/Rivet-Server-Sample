@@ -93,4 +93,4 @@ The Server also listens for Zoom Events. You can subscribe to events on the Zoom
 
 
 
-**Please note the Endpoint URL will need to point to the port being used by the module NOT the main server port provided in the .env file. For example, if the main server port is 5010, the Endpoint URL will point to 5011 for Users events, and 5012 for Meeting Events.
+**Please note the Endpoint URL will need to point to the port being used by the module NOT the Express server port provided in the .env file. For example, if the Users Express server port is 5010 in the .env file, the Users Module Endpoint URL will point to 5011 for Users events.
