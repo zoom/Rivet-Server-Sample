@@ -1,7 +1,7 @@
+This is a Sample App that showcases the power of the Zoom Rivet SDK by offering a one-click, quick start Express backend server. This server includes each Rivet module except the chatbot module ([Sample App for Rivet Chatbot here](https://github.com/zoom/rivet-javascript-sample))
+
 The [Zoom Rivet SDK](https://developers.zoom.us/docs/rivet/javascript/) is a framework that accelerates server-side app development for Zoom's developer products. 
 Compatible with JavaScript and TypeScript, this comprehensive tool enables developers to create integrations more quickly and spend more time on core business logic.
-
-This Sample App showcases the power of Rivet by offering a one-click, quick start Express backend server. This server includes each Rivet module except the chatbot module ([Sample App for Rivet Chatbot here](https://github.com/zoom/rivet-javascript-sample))
 
 Use of Zoom Rivet SDK is subject to our [Terms of Use](https://www.zoom.com/en/trust/terms/).
 
@@ -9,7 +9,7 @@ Use of Zoom Rivet SDK is subject to our [Terms of Use](https://www.zoom.com/en/t
 
 Clone this repo into your local enviroment:
 ```
-$ git clone https://github.com/Ticorrian-Heard/zoom-rivet-server.git
+$ git clone https://github.com/zoom/Rivet-Server-Sample.git
 ```
 
 Once cloned, cd into the directory and install the npm packages: 
@@ -25,6 +25,8 @@ You will need to build a [Server-to-Server](https://developers.zoom.us/docs/inte
 If you want to use Video SDK APIs, you will need an active [Zoom Video SDK account](https://developers.zoom.us/docs/video-sdk/get-credentials/) which will provide you with a Video SDK Key and Secret and a Webhook Secret Token.
 
 Insert these credentials into the respective fields in the `.env-sample` file and rename the file to `.env`.
+
+> :warning: **Do not store credentials in plain text on production environments**
 
 Next, specify a secure state store value for Rivet to use in the OAuth flow.
 
