@@ -97,7 +97,7 @@ const startServer = async () => {
 
         let request_data = req.body;
         let path = request_data.path;
-        let query = ('query' in request_data) ? request_data.query : {};
+        let query = ('query' in request_data) ? request_data.query : {action: "delete"};
 
         try {
           let responseData: object = await usersS2SOAuthClient.endpoints.users.deleteUser({ path, query });
